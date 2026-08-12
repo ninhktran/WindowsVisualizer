@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Windows Visualizer — Architectural Remodeling Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-navy-dark: #040914;
+      --bg-navy: #081226;
+      --bg-navy-light: #0d1e3d;
+      --navy-card: rgba(13, 30, 61, 0.78);
+      --navy-card-border: rgba(96, 165, 250, 0.18);
+      --navy-glow: rgba(37, 99, 235, 0.35);
+
+      --royal-blue: #2563eb;
+      --royal-blue-light: #60a5fa;
+      --gold: #d4af37;
+      --gold-light: #f3e5ab;
+      --gold-glow: rgba(212, 175, 55, 0.35);
+
+      --magenta-key: #ff00ff;
+      --magenta-glow: rgba(255, 0, 255, 0.4);
+
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-subtle: #64748b;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #0d234d 0%, var(--bg-navy-dark) 65%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Navbar */
+    .navbar {
+      height: 68px;
+      border-bottom: 1px solid var(--navy-card-border);
+      background: rgba(4, 9, 20, 0.92);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1d4ed8, #d4af37);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 18px var(--navy-glow);
+      color: #fff;
+    }
+
+    .brand-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-title span {
+      background: linear-gradient(135deg, #60a5fa 20%, #d4af37 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 1.15rem;
+      font-size: 0.84rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+
+    .btn svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.2;
+      stroke: currentColor;
+      fill: none;
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--navy-card-border);
+      color: #cbd5e1;
+    }
+
+    .btn-outline:hover {
+      background: rgba(96, 165, 250, 0.12);
+      border-color: var(--royal-blue-light);
+      color: #fff;
+    }
+
+    .btn-upload-new {
+      background: rgba(212, 175, 55, 0.15);
+      border-color: rgba(212, 175, 55, 0.4);
+      color: var(--gold-light);
+      font-weight: 700;
+    }
+
+    .btn-upload-new:hover {
+      background: rgba(212, 175, 55, 0.3);
+      border-color: var(--gold);
+      color: #fff;
+      box-shadow: 0 0 15px var(--gold-glow);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      border: 1px solid rgba(96, 165, 250, 0.4);
+      color: #ffffff;
+      box-shadow: 0 4px 20px var(--navy-glow);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 25px rgba(37, 99, 235, 0.6);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #d4af37, #b8860b);
+      color: #040914;
+      font-weight: 700;
+      box-shadow: 0 4px 20px var(--gold-glow);
+    }
+
+    .btn-gold:hover {
+      background: linear-gradient(135deg, #f3e5ab, #d4af37);
+      transform: translateY(-1px);
+    }
+
+    /* Modal Dialog for Upload Confirmation */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 9, 20, 0.85);
+      backdrop-filter: blur(16px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .modal-card {
+      background: var(--navy-card);
+      border: 1px solid var(--navy-card-border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+    }
+
+    .modal-icon svg {
+      width: 26px;
+      height: 26px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    .modal-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-desc {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 1.75rem;
+    }
+
+    .modal-btn-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    /* ==========================================
+       1. ROYAL NAVY UPLOAD & CONFIRMATION SCREEN (DEAD CENTERED)
+       ========================================== */
+    .landing-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      min-height: calc(100vh - 68px);
+      text-align: center;
+      position: relative;
+      width: 100%;
+    }
+
+    .upload-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .navy-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1.1rem;
+      border-radius: 9999px;
+      background: rgba(37, 99, 235, 0.15);
+      border: 1px solid rgba(96, 165, 250, 0.3);
+      color: var(--royal-blue-light);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 1.25rem;
+    }
+
+    .landing-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .landing-title span {
+      background: linear-gradient(135deg, #60a5fa 10%, #d4af37 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .landing-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 580px;
+      line-height: 1.6;
+      margin: 0 auto 2.5rem;
+    }
+
+    /* Upload Box */
+    .upload-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--navy-card);
+      backdrop-filter: blur(24px);
+      border: 2px dashed rgba(96, 165, 250, 0.35);
+      border-radius: var(--radius-lg);
+      padding: 3.5rem 2rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      position: relative;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-card:hover {
+      border-color: var(--royal-blue-light);
+      background: rgba(13, 30, 61, 0.95);
+      transform: translateY(-2px);
+      box-shadow: 0 25px 60px var(--navy-glow);
+    }
+
+    .upload-card:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 4px;
+    }
+
+    .upload-card.dragging {
+      border-color: var(--gold);
+      background: rgba(37, 99, 235, 0.22);
+      box-shadow: 0 25px 60px var(--gold-glow);
+    }
+
+    .upload-actions {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .privacy-note {
+      max-width: 480px;
+      margin: 1rem auto 0;
+      color: var(--text-subtle);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      line-height: 1.55;
+    }
+
+    .upload-icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(212, 175, 55, 0.2));
+      border: 1px solid rgba(96, 165, 250, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.25rem;
+      color: var(--royal-blue-light);
+      box-shadow: 0 0 20px var(--navy-glow);
+    }
+
+    .upload-icon svg {
+      width: 32px;
+      height: 32px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    .upload-prompt {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.35rem;
+    }
+
+    .upload-subtext {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    /* Confirmation Modal / Card */
+    .confirm-card {
+      display: none;
+      width: 100%;
+      max-width: 560px;
+      background: var(--navy-card);
+      backdrop-filter: blur(25px);
+      border: 1px solid var(--navy-card-border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+      text-align: left;
+      margin: 0 auto;
+    }
+
+    .confirm-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid var(--navy-card-border);
+      padding-bottom: 0.85rem;
+    }
+
+    .confirm-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .preview-img-wrap {
+      width: 100%;
+      height: 250px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #000;
+      margin-bottom: 1.25rem;
+      position: relative;
+    }
+
+    .preview-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .meta-val {
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+
+    .confirm-btn-row {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    /* ==========================================
+       2. 10-SECOND ROYAL NAVY PROCESSING OVERLAY
+       ========================================== */
+    .processing-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 9, 20, 0.96);
+      backdrop-filter: blur(25px);
+      z-index: 1000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .scan-box {
+      width: 190px;
+      height: 190px;
+      border-radius: 24px;
+      background: #081226;
+      border: 2px solid var(--royal-blue-light);
+      box-shadow: 0 0 40px var(--navy-glow);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .scan-box svg {
+      width: 72px;
+      height: 72px;
+      stroke: var(--royal-blue-light);
+      stroke-width: 1.6;
+      fill: none;
+    }
+
+    .scan-laser {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--royal-blue-light), var(--gold), transparent);
+      box-shadow: 0 0 15px var(--royal-blue-light), 0 0 30px var(--gold);
+      animation: scanLaser 2s ease-in-out infinite;
+    }
+
+    @keyframes scanLaser {
+      0% { top: 0%; opacity: 0.2; }
+      50% { top: 95%; opacity: 1; }
+      100% { top: 0%; opacity: 0.2; }
+    }
+
+    .proc-step-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .proc-step-desc {
+      font-size: 0.92rem;
+      color: var(--royal-blue-light);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 2rem;
+      min-height: 1.5rem;
+    }
+
+    .progress-bar-wrap {
+      width: 100%;
+      max-width: 440px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #2563eb, #d4af37);
+      box-shadow: 0 0 15px var(--navy-glow);
+      transition: width 0.3s ease;
+    }
+
+    .progress-percent {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+    }
+
+    .processing-actions {
+      margin-top: 1.25rem;
+    }
+
+    /* ==========================================
+       3. MAIN STUDIO SCREEN (ROYAL NAVY THEME)
+       ========================================== */
+    .studio-screen {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    /* Window Style Selector List (Left Sidebar) */
+    .style-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .style-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.5rem 0.8rem;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--navy-card-border);
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .style-pill:hover {
+      background: rgba(96, 165, 250, 0.1);
+      border-color: rgba(96, 165, 250, 0.45);
+      color: #fff;
+    }
+
+    .style-pill.active {
+      background: rgba(37, 99, 235, 0.22);
+      border-color: var(--royal-blue-light);
+      color: #fff;
+      box-shadow: 0 0 12px var(--navy-glow);
+    }
+
+    .style-pill.active::after {
+      content: "\2713";
+      color: var(--royal-blue-light);
+      font-weight: 800;
+      font-size: 0.8rem;
+    }
+
+    .count-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--navy-card-border);
+      border-radius: 9999px;
+      padding: 0.15rem 0.55rem;
+    }
+
+    /* 3-Column Studio Layout */
+    .workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 300px 1fr 340px;
+      height: calc(100vh - 68px);
+      overflow: hidden;
+    }
+
+    @media (max-width: 1200px) {
+      .workspace {
+        grid-template-columns: 280px 1fr;
+        height: auto;
+        overflow: auto;
+      }
+      .right-sidebar {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .workspace {
+        grid-template-columns: 1fr;
+        height: auto;
+        overflow: auto;
+      }
+    }
+
+    /* Sidebars */
+    .sidebar {
+      background: var(--navy-card);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--navy-card-border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 1.25rem;
+      gap: 1.25rem;
+    }
+
+    .right-sidebar {
+      border-right: none;
+      border-left: 1px solid var(--navy-card-border);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.55rem;
+    }
+
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--royal-blue-light);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Active Style Summary Card */
+    .style-info-card {
+      background: rgba(37, 99, 235, 0.08);
+      border: 1px solid var(--navy-card-border);
+      border-radius: var(--radius-md);
+      padding: 0.9rem;
+    }
+
+    .style-info-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+
+    .style-info-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* Sliders */
+    .control-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .control-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .control-label-row .val-badge {
+      color: var(--gold);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+
+    .slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--royal-blue-light);
+      box-shadow: 0 0 10px var(--navy-glow);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    /* Central Viewport Area */
+    .viewport-area {
+      background: var(--bg-navy-dark);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      overflow: hidden;
+    }
+
+    .canvas-card {
+      position: relative;
+      max-width: 100%;
+      max-height: calc(100vh - 140px);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+      border: 1px solid var(--navy-card-border);
+      background: #000;
+      user-select: none;
+    }
+
+    canvas {
+      display: block;
+      max-width: 100%;
+      max-height: calc(100vh - 142px);
+      object-fit: contain;
+    }
+
+    /* Split Slider Line & Floating Labels */
+    .split-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #ffffff;
+      cursor: ew-resize;
+      z-index: 40;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.9);
+      display: none;
+    }
+
+    .split-line::after {
+      content: "⇄";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 34px;
+      height: 34px;
+      background: #ffffff;
+      color: #0b0f17;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    .split-label-before, .split-label-after {
+      position: absolute;
+      bottom: 1rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      backdrop-filter: blur(10px);
+      z-index: 35;
+      display: none;
+      pointer-events: none;
+    }
+
+    .split-label-before {
+      left: 1rem;
+      background: rgba(4, 9, 20, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #cbd5e1;
+    }
+
+    .split-label-after {
+      right: 1rem;
+      background: rgba(37, 99, 235, 0.85);
+      border: 1px solid var(--royal-blue-light);
+      color: #fff;
+      box-shadow: 0 0 15px var(--navy-glow);
+    }
+
+    /* Floating Viewport Toolbar (Top of Image) */
+    .viewport-toolbar {
+      position: absolute;
+      top: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      background: rgba(8, 18, 38, 0.92);
+      backdrop-filter: blur(12px);
+      border-radius: 9999px;
+      border: 1px solid var(--navy-card-border);
+      z-index: 50;
+    }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 22px;
+      background: var(--navy-card-border);
+      margin: 0 0.3rem;
+    }
+
+    .toolbar-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-right: 0.1rem;
+    }
+
+    .viewport-toolbar input[type="color"] {
+      -webkit-appearance: none;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      background: transparent;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .viewport-toolbar input[type="color"]::-webkit-color-swatch {
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .hex-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      min-width: 62px;
+    }
+
+    .v-btn {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      border-radius: 9999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: all 0.15s;
+    }
+
+    .v-btn:hover {
+      color: #fff;
+    }
+
+    .v-btn.active {
+      background: rgba(37, 99, 235, 0.3);
+      color: var(--royal-blue-light);
+    }
+
+    /* Catalog Sections */
+    .category-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gold);
+      margin: 0.4rem 0 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .category-label.vinyl {
+      color: var(--royal-blue-light);
+    }
+
+    .catalog-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .catalog-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.55rem 0.7rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--navy-card-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .catalog-item:hover {
+      background: rgba(96, 165, 250, 0.08);
+      border-color: var(--royal-blue-light);
+      transform: translateX(2px);
+    }
+
+    .catalog-item.active {
+      background: rgba(37, 99, 235, 0.16);
+      border-color: var(--royal-blue-light);
+      box-shadow: 0 0 10px var(--navy-glow);
+    }
+
+    .catalog-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .catalog-item.active .catalog-swatch::after {
+      content: "✓";
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .catalog-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .catalog-name-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .catalog-name {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .catalog-hex {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    .catalog-profile {
+      font-size: 0.68rem;
+      color: var(--text-subtle);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+
+    /* Toast */
+    .toast-msg {
+      position: fixed;
+      top: 76px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: rgba(8, 18, 38, 0.95);
+      border: 1px solid var(--royal-blue-light);
+      color: #fff;
+      padding: 0.55rem 1.2rem;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      z-index: 1000;
+    }
+
+    .toast-msg.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="navbar">
+    <a href="#" class="brand" onclick="promptNewUploadConfirmation(); return false;">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" /><line x1="12" y1="3" x2="12" y2="21" /><line x1="3" y1="12" x2="21" y2="12" /></svg>
+      </div>
+      <div class="brand-title">Windows <span>Visualizer</span></div>
+    </a>
+    <div class="nav-actions">
+      <button class="btn btn-upload-new" id="btnRestartStudio" onclick="promptNewUploadConfirmation()" style="display: none;">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        <span>Upload New Image</span>
+      </button>
+      <button class="btn btn-primary" id="btnExport" onclick="exportRecoloredImage()" style="display: none;">
+        📥 Export High-Res
+      </button>
+    </div>
+  </header>
+
+  <!-- Confirmation Modal for Starting New Upload -->
+  <div class="modal-backdrop" id="newUploadModal">
+    <div class="modal-card">
+      <div class="modal-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      </div>
+      <div class="modal-title">Upload New Image?</div>
+      <div class="modal-desc">
+        Are you sure you want to upload a new image and start a new project from the beginning?
+      </div>
+      <div class="modal-btn-row">
+        <button class="btn btn-outline" style="flex: 1;" onclick="closeNewUploadModal()">
+          Cancel
+        </button>
+        <button class="btn btn-gold" style="flex: 1.2;" onclick="confirmRestartToBeginning()">
+          Yes, New Upload
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       1. UPLOAD & CONFIRMATION SCREEN (DEAD CENTERED)
+       ========================================== -->
+  <section class="landing-screen" id="landingScreen">
+
+    <!-- State A: Clean Upload Dropzone (Dead Centered) -->
+    <div class="upload-container" id="uploadView">
+      <div class="navy-badge">AI-assisted architectural prototype</div>
+      <h1 class="landing-title">Windows <span>Visualizer</span></h1>
+      <p class="landing-subtitle">
+        Upload a room photo to explore 10 architectural replacement styles and 11 catalog finishes in real time.
+      </p>
+
+      <div class="upload-card" id="uploadCard" onclick="triggerNativeFileInput()" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); triggerNativeFileInput(); }" tabindex="0" role="button" aria-controls="nativeFileInput">
+        <input type="file" id="nativeFileInput" accept="image/*" style="display: none;" onchange="onImageFileSelected(event)" />
+        <div class="upload-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        </div>
+        <div class="upload-prompt">Select Room Image</div>
+        <div class="upload-subtext">Click to browse or drop an image file (JPEG, PNG, HEIC)</div>
+      </div>
+      <p class="privacy-note">Your image is sent to the configured server for Gemini analysis and removed after the short job-retention window. No API key ships to this page.</p>
+    </div>
+
+    <!-- State B: Image Confirmation Screen (Shows image before proceeding) -->
+    <div class="confirm-card" id="confirmView">
+      <div class="confirm-header">
+        <div class="confirm-title">Confirm Room Window Photo</div>
+        <span class="navy-badge" style="margin: 0; padding: 2px 8px; font-size: 0.7rem;">Selected Image</span>
+      </div>
+
+      <div class="preview-img-wrap">
+        <img id="confirmImgPreview" alt="Selected room window" />
+      </div>
+
+      <div class="meta-row">
+        <span>File Name:</span>
+        <span class="meta-val" id="metaFileName">Room_Photo.jpg</span>
+      </div>
+      <div class="meta-row">
+        <span>Window Aperture:</span>
+        <span class="meta-val" id="metaWindowAperture">Awaiting analysis</span>
+      </div>
+      <div class="meta-row">
+        <span>Analysis:</span>
+        <span class="meta-val" id="metaWindowState" style="color: var(--gold);">Ready to analyze</span>
+      </div>
+
+      <div class="confirm-btn-row">
+        <button class="btn btn-outline" style="flex: 1;" onclick="cancelImageSelection()">
+          Cancel / Reselect
+        </button>
+        <button class="btn btn-primary" style="flex: 1.6;" onclick="startAnalysis()">
+          Analyze Room
+        </button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==========================================
+       2. 10-SECOND ROYAL NAVY PROCESSING OVERLAY
+       ========================================== -->
+  <div class="processing-overlay" id="processingOverlay">
+    <div class="scan-box">
+      <div class="scan-laser"></div>
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" /><line x1="12" y1="3" x2="12" y2="21" /><line x1="3" y1="12" x2="21" y2="12" /></svg>
+    </div>
+    <div class="proc-step-title" id="procTitle">AI Room Geometry Segmentation</div>
+    <div class="proc-step-desc" id="procDesc">[1/4] Scanning room geometry & window casing...</div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="procFill"></div>
+    </div>
+    <div class="progress-percent" id="procPercent">0% Completed</div>
+    <div class="processing-actions">
+      <button class="btn btn-outline" type="button" onclick="skipProcessing()">Skip to studio</button>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       3. MAIN 10-STYLE STUDIO SCREEN
+       ========================================== -->
+  <div class="studio-screen" id="studioScreen">
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast-msg">Applied Golden Oak</div>
+
+    <!-- Main 3-Column Studio Workspace -->
+    <main class="workspace">
+
+      <!-- LEFT SIDEBAR: Window Style Selection, Active Style Summary & Chroma Sensitivity Controls -->
+      <aside class="sidebar">
+        <div>
+          <div class="section-header">
+            <span class="section-title">Window Style</span>
+            <span class="count-badge">10 styles</span>
+          </div>
+          <div class="style-list">
+             <button class="style-pill" onclick="selectStyle('awning', this)">
+              <span>Awning Windows</span>
+            </button>
+             <button class="style-pill active" onclick="selectStyle('bay', this)">
+              <span>Bay Windows (3-Panel)</span>
+            </button>
+             <button class="style-pill" onclick="selectStyle('bow', this)">
+              <span>Bow Windows (5-Panel)</span>
+            </button>
+             <button class="style-pill" onclick="selectStyle('casement', this)">
+              <span>Casement Windows</span>
+            </button>
+             <button class="style-pill" onclick="selectStyle('double_hung', this)">
+              <span>Double-Hung Windows</span>
+            </button>
+             <button class="style-pill" onclick="selectStyle('garden', this)">
+              <span>Garden Windows</span>
+            </button>
+             <button class="style-pill" onclick="selectStyle('hopper', this)">
+              <span>Hopper Windows</span>
+            </button>
+             <button class="style-pill" onclick="selectStyle('picture', this)">
+              <span>Picture Windows</span>
+            </button>
+             <button class="style-pill" onclick="selectStyle('sliding', this)">
+              <span>Sliding Windows</span>
+            </button>
+             <button class="style-pill" onclick="selectStyle('specialty', this)">
+              <span>Specialty Windows</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="style-info-card">
+           <div class="style-info-title" id="activeStyleTitle">Bay Windows (3-Panel)</div>
+           <div class="style-info-desc" id="activeStyleDesc">Three windows projecting outward at 45-degree angles with an integrated interior oak bench.</div>
+        </div>
+
+        <!-- User-Requested Pink Replacement Sensitivity Controls (Defaulted at 23) -->
+        <div>
+          <div class="section-header">
+            <span class="section-title">Chroma-Key Controls</span>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label-row">
+              <span>Replacement Sensitivity</span>
+              <span class="val-badge" id="tolerance-val">Tolerance: 23</span>
+            </div>
+            <input type="range" class="slider" id="tolerance-slider" min="0" max="45" value="23" oninput="updateTolerance(this.value)" />
+            <div style="font-size: 0.70rem; color: var(--text-subtle); margin-top: 2px;">
+              Defaulted at 23 for optimal photographic edge capture.
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CENTER VIEWPORT: Real-time Canvas Rendering Engine -->
+      <section class="viewport-area" id="viewportArea">
+        <div class="canvas-card" id="canvasContainer">
+          <canvas id="mainCanvas"></canvas>
+          <div class="split-line" id="splitLine"></div>
+          <div class="split-label-before" id="labelBefore">◀ Original Room (Before)</div>
+          <div class="split-label-after" id="labelAfter">New Window & Finish (After) ▶</div>
+        </div>
+
+        <!-- Top Floating Controls + Custom Paint Tone -->
+        <div class="viewport-toolbar">
+          <button class="v-btn active" id="btn-mode-full" onclick="setViewMode('full')">Full View</button>
+          <button class="v-btn" id="btn-mode-split" onclick="setViewMode('split')">⇄ Split Against Original</button>
+          <div class="toolbar-divider"></div>
+          <span class="toolbar-label">Custom Paint Tone</span>
+          <input type="color" id="customColorInput" value="#AC7E5B" oninput="onCustomColorPick(this.value)" />
+          <div class="hex-display" id="hexLabel">#AC7E5B</div>
+        </div>
+      </section>
+
+      <!-- RIGHT SIDEBAR: The 11 User-Requested Finishes & Textures -->
+      <aside class="sidebar right-sidebar">
+        <div>
+          <!-- Section 1: Wood Stain Finishes -->
+          <div class="category-label">Wood Stain Finishes (Natural & Traditional)</div>
+          <div class="catalog-list">
+
+            <div class="catalog-item active" onclick="selectFinish('Golden Oak', '#AC7E5B', [172, 126, 91], this)">
+              <div class="catalog-swatch" style="background: #AC7E5B;"></div>
+              <div class="catalog-info">
+                <div class="catalog-name-row">
+                  <span class="catalog-name">Golden Oak</span>
+                  <span class="catalog-hex">#AC7E5B</span>
+                </div>
+                <div class="catalog-profile">Authentic warm golden oak tone with natural wood grain</div>
+              </div>
+            </div>
+
+            <div class="catalog-item" onclick="selectFinish('Natural Pine / Birch', '#D8C09A', [216, 192, 154], this)">
+              <div class="catalog-swatch" style="background: #D8C09A;"></div>
+              <div class="catalog-info">
+                <div class="catalog-name-row">
+                  <span class="catalog-name">Natural Pine / Birch</span>
+                  <span class="catalog-hex">#D8C09A</span>
+                </div>
+                <div class="catalog-profile">Light pale tan tone for modern minimalist framing</div>
+              </div>
+            </div>
+
+            <div class="catalog-item" onclick="selectFinish('Walnut', '#5C4033', [92, 64, 51], this)">
+              <div class="catalog-swatch" style="background: #5C4033;"></div>
+              <div class="catalog-info">
+                <div class="catalog-name-row">
+                  <span class="catalog-name">Walnut</span>
+                  <span class="catalog-hex">#5C4033</span>
+                </div>
+                <div class="catalog-profile">Deep dark chocolate brown with rich warm undertones</div>
+              </div>
+            </div>
+
+            <div class="catalog-item" onclick="selectFinish('Espresso / Dark Ebony', '#2C221C', [44, 34, 28], this)">
+              <div class="catalog-swatch" style="background: #2C221C;"></div>
+              <div class="catalog-info">
+                <div class="catalog-name-row">
+                  <span class="catalog-name">Espresso / Dark Ebony</span>
+                  <span class="catalog-hex">#2C221C</span>
+                </div>
+                <div class="catalog-profile">Very dark brown, almost charcoal-black</div>
+              </div>
+            </div>
+
+            <div class="catalog-item" onclick="selectFinish('Mahogany', '#7C4434', [124, 68, 52], this)">
+              <div class="catalog-swatch" style="background: #7C4434;"></div>
+              <div class="catalog-info">
+                <div class="catalog-name-row">
+                  <span class="catalog-name">Mahogany</span>
+                  <span class="catalog-hex">#7C4434</span>
+                </div>
+                <div class="catalog-profile">Dark reddish-brown with deep burgundy undertones</div>
+              </div>
+            </div>
+
+            <div class="catalog-item" onclick="selectFinish('Cherry', '#8E4A33', [142, 74, 51], this)">
+              <div class="catalog-swatch" style="background: #8E4A33;"></div>
+              <div class="catalog-info">
+                <div class="catalog-name-row">
+                  <span class="catalog-name">Cherry</span>
+                  <span class="catalog-hex">#8E4A33</span>
+                </div>
+                <div class="catalog-profile">Medium reddish-brown wood stain</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Section 2: Painted & Vinyl Finishes -->
+          <div class="category-label vinyl" style="margin-top: 0.9rem;">Painted & Vinyl Finishes (Modern & Farmhouse)</div>
+          <div class="catalog-list">
+
+            <div class="catalog-item" onclick="selectFinish('Pure White', '#F5F5F5', [245, 245, 245], this)">
+              <div class="catalog-swatch" style="background: #F5F5F5;"></div>
+              <div class="catalog-info">
+                <div class="catalog-name-row">
+                  <span class="catalog-name">Pure White</span>
+                  <span class="catalog-hex">#F5F5F5</span>
+                </div>
+                <div class="catalog-profile">Crisp, clean standard builder white</div>
+              </div>
+            </div>
+
+            <div class="catalog-item" onclick="selectFinish('Off-White / Soft White', '#EEE9E0', [238, 233, 224], this)">
+              <div class="catalog-swatch" style="background: #EEE9E0;"></div>
+              <div class="catalog-info">
+                <div class="catalog-name-row">
+                  <span class="catalog-name">Off-White / Soft White</span>
+                  <span class="catalog-hex">#EEE9E0</span>
+                </div>
+                <div class="catalog-profile">Slightly warm white to match light trim</div>
+              </div>
+            </div>
+
+            <div class="catalog-item" onclick="selectFinish('Matte Black', '#282828', [40, 40, 40], this)">
+              <div class="catalog-swatch" style="background: #282828;"></div>
+              <div class="catalog-info">
+                <div class="catalog-name-row">
+                  <span class="catalog-name">Matte Black</span>
+                  <span class="catalog-hex">#282828</span>
+                </div>
+                <div class="catalog-profile">Popular modern farmhouse accent tone</div>
+              </div>
+            </div>
+
+            <div class="catalog-item" onclick="selectFinish('Bronze / Dark Anodized', '#443B34', [68, 59, 52], this)">
+              <div class="catalog-swatch" style="background: #443B34;"></div>
+              <div class="catalog-info">
+                <div class="catalog-name-row">
+                  <span class="catalog-name">Bronze / Dark Anodized</span>
+                  <span class="catalog-hex">#443B34</span>
+                </div>
+                <div class="catalog-profile">Metallic dark brown-gray modern architectural aluminum</div>
+              </div>
+            </div>
+
+            <div class="catalog-item" onclick="selectFinish('Charcoal / Slate Gray', '#4A5055', [74, 80, 85], this)">
+              <div class="catalog-swatch" style="background: #4A5055;"></div>
+              <div class="catalog-info">
+                <div class="catalog-name-row">
+                  <span class="catalog-name">Charcoal / Slate Gray</span>
+                  <span class="catalog-hex">#4A5055</span>
+                </div>
+                <div class="catalog-profile">Cool-toned dark gray</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </aside>
+
+    </main>
+  </div>
+
+  <script>
+    const STYLE_DESCRIPTIONS = {
+      'awning': { title: 'Awning Windows', desc: 'Hinged at the top, opening outward at an angle for rain-safe ventilation and panoramic garden views.' },
+      'bay': { title: 'Bay Windows (3-Panel)', desc: 'Three windows projecting outward at 45-degree angles with an integrated interior oak bench.' },
+      'bow': { title: 'Bow Windows (5-Panel)', desc: 'Four or more windows arranged in a graceful panoramic curved arc.' },
+      'casement': { title: 'Casement Windows', desc: 'Hinged at the sides, opening outward with crank hardware and wide clear views.' },
+      'double_hung': { title: 'Double-Hung Windows', desc: 'Two sashes that slide vertically with upper and lower operable sashes and colonial grilles.' },
+      'garden': { title: 'Garden Windows', desc: 'Outward-projecting greenhouse window featuring a deep glass roof and interior shelf sill for potted plants and herbs.' },
+      'hopper': { title: 'Hopper Windows', desc: 'Hinging at the bottom, tilting inward from the top for secure draft-free airflow.' },
+      'picture': { title: 'Picture Windows', desc: 'A grand seamless unobstructed picture pane offering an expansive view of the garden trees.' },
+      'sliding': { title: 'Sliding Windows', desc: 'Two wide glass sashes that glide horizontally with ease.' },
+      'specialty': { title: 'Specialty Windows', desc: 'Unique architectural designs from arches to geometric sunburst patterns.' }
+    };
+
+    // State
+    let keyImage = new Image();
+    let currentFinishName = 'Golden Oak';
+    let currentRgb = [172, 126, 91];
+    let currentHex = '#AC7E5B';
+
+    // Original Room Image State (for Before / After Split Slider)
+    let originalRoomSrc = null;
+    let originalRoomImage = new Image();
+    let originalRoomImageData = null;
+
+    // Interactive Sliders State (DEFAULT TOLERANCE = 23)
+    let keyTolerance = 23; // Defaulted at 23 as requested by user
+
+    let viewMode = 'full';
+    let splitPos = 0.5;
+    let isDraggingSplit = false;
+    let analysisController = null;
+    let processingComplete = false;
+    let selectedRoomFile = null;
+    let currentJobId = null;
+    let roomAnalysis = null;
+    let currentStyleKey = 'bay';
+    let splitDragSetup = false;
+
+    // Canvas Elements
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const splitLine = document.getElementById('splitLine');
+    const labelBefore = document.getElementById('labelBefore');
+    const labelAfter = document.getElementById('labelAfter');
+
+    let keyImageData = null;
+
+    // Offscreen Canvas for Original Room Image Scaling
+    const offCanvas = document.createElement('canvas');
+    const offCtx = offCanvas.getContext('2d', { willReadFrequently: true });
+
+    // ==========================================
+    // IMAGE SELECTION, CONFIRMATION & RESET
+    // ==========================================
+    function triggerNativeFileInput() {
+      document.getElementById('nativeFileInput').click();
+    }
+
+    function handleImageFile(file) {
+      if (!file || !file.type.startsWith('image/')) {
+        showToast('Please choose an image file');
+        return;
+      }
+
+      selectedRoomFile = file;
+      currentJobId = null;
+      roomAnalysis = null;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        originalRoomSrc = evt.target.result;
+        showConfirmationCard(evt.target.result, file.name);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function onImageFileSelected(e) {
+      if (e.target.files && e.target.files[0]) {
+        handleImageFile(e.target.files[0]);
+      }
+    }
+
+    const uploadCard = document.getElementById('uploadCard');
+    if (uploadCard) {
+      ['dragenter', 'dragover'].forEach(type => {
+        uploadCard.addEventListener(type, event => {
+          event.preventDefault();
+          uploadCard.classList.add('dragging');
+        });
+      });
+      ['dragleave', 'drop'].forEach(type => {
+        uploadCard.addEventListener(type, event => {
+          event.preventDefault();
+          uploadCard.classList.remove('dragging');
+        });
+      });
+      uploadCard.addEventListener('drop', event => {
+        handleImageFile(event.dataTransfer.files[0]);
+      });
+    }
+
+    /* Keep the file path local until the optional AI backend is added. */
+    function showConfirmationCard(imgSrc, displayName) {
+      document.getElementById('uploadView').style.display = 'none';
+      const confirmCard = document.getElementById('confirmView');
+      confirmCard.style.display = 'block';
+
+      document.getElementById('confirmImgPreview').src = imgSrc;
+      document.getElementById('metaFileName').innerText = displayName;
+    }
+
+    function cancelImageSelection() {
+      document.getElementById('confirmView').style.display = 'none';
+      document.getElementById('uploadView').style.display = 'flex';
+      selectedRoomFile = null;
+      currentJobId = null;
+      roomAnalysis = null;
+    }
+
+    // Modal Confirmation for Uploading New Image
+    function promptNewUploadConfirmation() {
+      document.getElementById('newUploadModal').style.display = 'flex';
+    }
+
+    function closeNewUploadModal() {
+      document.getElementById('newUploadModal').style.display = 'none';
+    }
+
+    function confirmRestartToBeginning() {
+      closeNewUploadModal();
+      document.getElementById('studioScreen').style.display = 'none';
+      document.getElementById('btnRestartStudio').style.display = 'none';
+      document.getElementById('btnExport').style.display = 'none';
+      selectedRoomFile = null;
+      currentJobId = null;
+      roomAnalysis = null;
+
+      cancelImageSelection();
+      document.getElementById('landingScreen').style.display = 'flex';
+      showToast('Ready for new image upload');
+    }
+
+    async function getAnalysisFile() {
+      if (!selectedRoomFile) throw new Error('No room image selected.');
+      return selectedRoomFile;
+    }
+
+    function updateAnalysisSummary(data) {
+      const windowData = data?.analysis?.window || {};
+      const confidence = Math.round(Number(windowData.confidence || 0) * 100);
+      const aperture = document.getElementById('metaWindowAperture');
+      const state = document.getElementById('metaWindowState');
+      if (aperture) aperture.innerText = `${confidence}% confidence window region`;
+      if (state) {
+        state.innerText = data.provider === 'gemini'
+          ? 'AI analysis complete'
+          : 'Centered fallback region';
+      }
+    }
+
+    async function startAnalysis() {
+      document.getElementById('landingScreen').style.display = 'none';
+      const overlay = document.getElementById('processingOverlay');
+      overlay.style.display = 'flex';
+      processingComplete = false;
+      document.getElementById('procTitle').innerText = 'Analyzing Room Geometry';
+      document.getElementById('procDesc').innerText = '[1/1] Sending a sanitized image to the local backend...';
+      document.getElementById('procFill').style.width = '12%';
+      document.getElementById('procPercent').innerText = 'Analysis in progress';
+
+      analysisController = new AbortController();
+      try {
+        const file = await getAnalysisFile();
+        const body = new FormData();
+        body.append('upload', file);
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          body,
+          signal: analysisController.signal
+        });
+        if (!response.ok) throw new Error(`Backend unavailable (${response.status})`);
+        const data = await response.json();
+        currentJobId = data.job_id;
+        roomAnalysis = data.analysis;
+        updateAnalysisSummary(data);
+        analysisController = null;
+        if (!processingComplete) {
+          processingComplete = true;
+          await finishSimulation();
+        }
+      } catch (error) {
+        analysisController = null;
+        if (processingComplete) return;
+        document.getElementById('processingOverlay').style.display = 'none';
+        document.getElementById('landingScreen').style.display = 'flex';
+        showToast('Backend unavailable - start the server and try again');
+      }
+    }
+
+    function skipProcessing() {
+      processingComplete = true;
+      if (analysisController) {
+        analysisController.abort();
+        analysisController = null;
+      }
+      void finishSimulation();
+    }
+
+    async function finishSimulation() {
+      document.getElementById('processingOverlay').style.display = 'none';
+      await launchMainStudio();
+    }
+
+    async function launchMainStudio() {
+      document.getElementById('studioScreen').style.display = 'flex';
+      document.getElementById('btnRestartStudio').style.display = 'inline-flex';
+      document.getElementById('btnExport').style.display = 'inline-flex';
+
+      loadOriginalRoomImage();
+      await renderRemoteStyle(currentStyleKey);
+      setupSplitDrag();
+    }
+
+    function loadOriginalRoomImage() {
+      originalRoomImage = new Image();
+      originalRoomImage.crossOrigin = 'anonymous';
+      originalRoomImage.onload = () => {
+        updateOriginalImageData();
+      };
+      originalRoomImage.src = originalRoomSrc;
+    }
+
+    function updateOriginalImageData() {
+      if (!originalRoomImage.naturalWidth || !canvas.width) return;
+      offCanvas.width = canvas.width;
+      offCanvas.height = canvas.height;
+      offCtx.drawImage(originalRoomImage, 0, 0, canvas.width, canvas.height);
+      originalRoomImageData = offCtx.getImageData(0, 0, canvas.width, canvas.height);
+      renderChromaKeyReplacement();
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function selectStyle(key, el) {
+      document.querySelectorAll('.style-pill').forEach(pill => pill.classList.remove('active'));
+      if (el) el.classList.add('active');
+      currentStyleKey = key;
+
+      const info = STYLE_DESCRIPTIONS[key] || { title: key, desc: '' };
+      document.getElementById('activeStyleTitle').innerText = info.title;
+      document.getElementById('activeStyleDesc').innerText = info.desc;
+
+      void renderRemoteStyle(key);
+    }
+
+    function loadKeyImage(src) {
+      keyImage = new Image();
+      keyImage.crossOrigin = 'anonymous';
+      keyImage.onload = () => {
+        canvas.width = keyImage.naturalWidth;
+        canvas.height = keyImage.naturalHeight;
+        ctx.drawImage(keyImage, 0, 0);
+        keyImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        updateOriginalImageData();
+        renderChromaKeyReplacement();
+      };
+      keyImage.src = src;
+    }
+
+    async function renderRemoteStyle(style) {
+      if (!currentJobId) return;
+
+      try {
+        const response = await fetch(`/api/jobs/${encodeURIComponent(currentJobId)}/render`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            style,
+            polygon: roomAnalysis?.window?.polygon || null,
+            use_ai: true
+          })
+        });
+        if (!response.ok) throw new Error(`Render failed (${response.status})`);
+        const result = await response.json();
+        loadKeyImage(`${result.result_url}?t=${Date.now()}`);
+        showToast(result.provider === 'gemini' ? 'AI window render ready' : 'Local geometry render ready');
+      } catch (error) {
+        showToast('AI render unavailable - backend error');
+      }
+    }
+
+    // =========================================================================
+    // 60 FPS LUMINANCE-PRESERVING SHADER WITH BEFORE/AFTER SPLIT
+    // =========================================================================
+    function renderChromaKeyReplacement() {
+      if (!keyImageData) return;
+
+      const w = canvas.width;
+      const h = canvas.height;
+      const src = keyImageData.data;
+      const orig = originalRoomImageData ? originalRoomImageData.data : null;
+      const output = ctx.createImageData(w, h);
+      const out = output.data;
+
+      const [tr, tg, tb] = currentRgb;
+      const splitBoundaryX = (viewMode === 'split') ? Math.floor(w * splitPos) : -1;
+
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const idx = (y * w + x) * 4;
+
+          // In Split Mode: Left side renders the exact Original Room Photo before renovation
+          if (viewMode === 'split' && x < splitBoundaryX && orig) {
+            out[idx]     = orig[idx];
+            out[idx + 1] = orig[idx + 1];
+            out[idx + 2] = orig[idx + 2];
+            out[idx + 3] = orig[idx + 3];
+            continue;
+          }
+
+          const r = src[idx];
+          const g = src[idx + 1];
+          const b = src[idx + 2];
+          const a = src[idx + 3];
+
+          // Dynamic Hue-Difference Chroma-Keying controlled by Slider (Tolerance = 23)
+          const diffRG = r - g;
+          const diffBG = b - g;
+          const pinkProminence = (diffRG + diffBG) / 2.0;
+
+          const isMagenta = (diffRG > keyTolerance && diffBG > -12 && pinkProminence > keyTolerance);
+
+          if (isMagenta) {
+            const alpha = Math.min(1.0, Math.max(0.0, (pinkProminence - keyTolerance) / 12.0));
+
+            // True Photographic Texture Luminance Ratio
+            const pixelLum = (r * 0.5 + b * 0.5);
+            const lumRatio = Math.max(0.35, Math.min(1.75, pixelLum / 185.0));
+
+            // Pure photographic color infill
+            const targetShadedR = Math.min(255, Math.max(0, tr * lumRatio));
+            const targetShadedG = Math.min(255, Math.max(0, tg * lumRatio));
+            const targetShadedB = Math.min(255, Math.max(0, tb * lumRatio));
+
+            out[idx]     = Math.round((r * (1 - alpha)) + (targetShadedR * alpha));
+            out[idx + 1] = Math.round((g * (1 - alpha)) + (targetShadedG * alpha));
+            out[idx + 2] = Math.round((b * (1 - alpha)) + (targetShadedB * alpha));
+            out[idx + 3] = a;
+          } else {
+            out[idx]     = r;
+            out[idx + 1] = g;
+            out[idx + 2] = b;
+            out[idx + 3] = a;
+          }
+        }
+      }
+
+      ctx.putImageData(output, 0, 0);
+
+      if (viewMode === 'split') {
+        splitLine.style.display = 'block';
+        splitLine.style.left = (splitPos * 100) + '%';
+        labelBefore.style.display = 'block';
+        labelAfter.style.display = 'block';
+      } else {
+        splitLine.style.display = 'none';
+        labelBefore.style.display = 'none';
+        labelAfter.style.display = 'none';
+      }
+    }
+
+    // ==========================================
+    // UI HANDLERS & SLIDER CALLBACKS
+    // ==========================================
+    function updateTolerance(val) {
+      keyTolerance = parseInt(val);
+      document.getElementById('tolerance-val').innerText = `Tolerance: ${val}`;
+      renderChromaKeyReplacement();
+    }
+
+    function selectFinish(name, hex, rgb, el) {
+      currentFinishName = name;
+      currentHex = hex;
+      currentRgb = rgb;
+
+      document.querySelectorAll('.catalog-item').forEach(item => item.classList.remove('active'));
+      if (el) el.classList.add('active');
+
+      document.getElementById('customColorInput').value = hex;
+      document.getElementById('hexLabel').innerText = hex.toUpperCase();
+
+      renderChromaKeyReplacement();
+      showToast(`Applied ${name}`);
+    }
+
+    function onCustomColorPick(hex) {
+      currentHex = hex;
+      currentRgb = [
+        parseInt(hex.substring(1, 3), 16),
+        parseInt(hex.substring(3, 5), 16),
+        parseInt(hex.substring(5, 7), 16)
+      ];
+      document.querySelectorAll('.catalog-item').forEach(item => item.classList.remove('active'));
+      document.getElementById('hexLabel').innerText = hex.toUpperCase();
+      renderChromaKeyReplacement();
+    }
+
+    function setViewMode(mode) {
+      viewMode = mode;
+      document.querySelectorAll('.v-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('btn-mode-' + mode).classList.add('active');
+      renderChromaKeyReplacement();
+    }
+
+    function setupSplitDrag() {
+      if (splitDragSetup) return;
+      splitDragSetup = true;
+      const onMove = (clientX) => {
+        if (!isDraggingSplit || viewMode !== 'split') return;
+        const rect = canvas.getBoundingClientRect();
+        let pos = (clientX - rect.left) / rect.width;
+        pos = Math.max(0.05, Math.min(0.95, pos));
+        splitPos = pos;
+        renderChromaKeyReplacement();
+      };
+
+      splitLine.addEventListener('mousedown', () => { isDraggingSplit = true; });
+      window.addEventListener('mousemove', (e) => onMove(e.clientX));
+      window.addEventListener('mouseup', () => { isDraggingSplit = false; });
+    }
+
+    function exportRecoloredImage() {
+      const link = document.createElement('a');
+      link.download = `window_${currentFinishName.toLowerCase().replace(/[\s\/]+/g, '_')}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast(`Exported ${currentFinishName} Photo!`);
+    }
+  </script>
+</body>
+</html>
